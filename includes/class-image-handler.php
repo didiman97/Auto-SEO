@@ -46,8 +46,11 @@ class Synka_Auto_SEO_Image_Handler {
             ? $image_prompt 
             : ("A realistic modern professional photograph representing " . $alt_text . ", " . $keyword . ", clean composition, studio lighting");
 
+        $width = !empty($settings['image_width']) ? (int)$settings['image_width'] : 1200;
+        $height = !empty($settings['image_height']) ? (int)$settings['image_height'] : 675;
+
         $enhanced_prompt = "hyper-realistic 8k professional editorial photograph, " . $ai_prompt_text . ", natural cinematic lighting, clean background, sharp focus, 16:9 widescreen, highly detailed, photorealistic, no text watermark";
-        $ai_image_url = "https://image.pollinations.ai/prompt/" . rawurlencode($enhanced_prompt) . "?width=1200&height=675&nologo=true&seed=" . $seed . "&model=flux";
+        $ai_image_url = "https://image.pollinations.ai/prompt/" . rawurlencode($enhanced_prompt) . "?width=" . $width . "&height=" . $height . "&nologo=true&seed=" . $seed . "&model=flux";
 
         return $ai_image_url;
     }

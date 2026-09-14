@@ -301,6 +301,24 @@ class Synka_Auto_SEO_Admin_Settings {
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th scope="row"><label for="image_dimension_preset">Ukuran Gambar (Resolusi)</label></th>
+                                        <td>
+                                            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                                                <div style="display: flex; align-items: center; gap: 6px;">
+                                                    <label for="image_width" style="font-weight: 500; font-size: 13px;">Lebar:</label>
+                                                    <input type="number" name="synka_auto_seo_settings[image_width]" id="image_width" value="<?php echo esc_attr(!empty($settings['image_width']) ? $settings['image_width'] : 1200); ?>" style="width: 90px;" min="200" max="3840"> <span style="font-size: 12px; color: #64748b;">px</span>
+                                                </div>
+                                                <div style="display: flex; align-items: center; gap: 6px;">
+                                                    <label for="image_height" style="font-weight: 500; font-size: 13px;">Tinggi:</label>
+                                                    <input type="number" name="synka_auto_seo_settings[image_height]" id="image_height" value="<?php echo esc_attr(!empty($settings['image_height']) ? $settings['image_height'] : 675); ?>" style="width: 90px;" min="200" max="3840"> <span style="font-size: 12px; color: #64748b;">px</span>
+                                                </div>
+                                            </div>
+                                            <p class="description" style="margin-top: 6px;">
+                                                Standar bawaan: <strong>1200 x 675 px</strong> (Rasio 16:9 — Format paling ideal & direkomendasikan Google untuk SEO featured image, Google Discover, dan thumbnail website).
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th scope="row"><label for="unsplash_api_key">Unsplash Access Key (Opsional)</label></th>
                                         <td>
                                             <input type="text" name="synka_auto_seo_settings[unsplash_api_key]" id="unsplash_api_key" value="<?php echo esc_attr(isset($settings['unsplash_api_key']) ? $settings['unsplash_api_key'] : ''); ?>" class="large-text" placeholder="Access Key dari Unsplash Developers">

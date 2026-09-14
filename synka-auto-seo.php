@@ -77,6 +77,8 @@ class Synka_Auto_SEO {
                 'default_author' => 1,
                 'default_category' => 1,
                 'enable_image' => 1,
+                'image_width' => 1200,
+                'image_height' => 675,
                 'unsplash_api_key' => '',
                 'article_length' => '1200-1800',
                 'article_language' => 'id',
