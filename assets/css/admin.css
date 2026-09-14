@@ -1,0 +1,380 @@
+/**
+ * Synka Auto SEO - Admin CSS Styling
+ */
+
+.synka-seo-wrap {
+    margin: 20px 20px 0 2px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.synka-header {
+    background: #ffffff;
+    padding: 24px 30px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.synka-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+    border: 1px solid #bfdbfe;
+}
+
+.synka-header h1 {
+    margin: 0 0 6px 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.synka-tagline {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.synka-header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.synka-header-actions .button {
+    height: 40px;
+    line-height: 38px;
+    padding: 0 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+}
+
+.synka-alert {
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.synka-alert.success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+.synka-alert.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+.synka-alert.info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+}
+
+/* 2-Column Grid */
+.synka-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .synka-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.synka-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.synka-card-header {
+    background: #f8fafc;
+    padding: 16px 22px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.synka-card-header.synka-flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.synka-card-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.synka-card-body {
+    padding: 22px;
+}
+
+.synka-card-body .form-table {
+    margin: 0;
+}
+
+.synka-card-body .form-table th {
+    font-weight: 600;
+    color: #334155;
+    width: 220px;
+}
+
+.synka-link-guide {
+    display: inline-block;
+    margin-top: 6px;
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+.synka-link-guide:hover {
+    text-decoration: underline;
+}
+
+/* Logs Sidebar */
+.synka-log-container {
+    max-height: 650px;
+    overflow-y: auto;
+    padding: 16px !important;
+}
+
+.synka-log-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.log-item {
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 0.85rem;
+}
+
+.log-item.log-success {
+    border-left: 4px solid #10b981;
+}
+
+.log-item.log-error {
+    border-left: 4px solid #ef4444;
+}
+
+.log-item.log-info {
+    border-left: 4px solid #3b82f6;
+}
+
+.log-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.log-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.log-badge-success { background: #d1fae5; color: #065f46; }
+.log-badge-error { background: #fee2e2; color: #991b1b; }
+.log-badge-info { background: #dbeafe; color: #1e40af; }
+
+.log-time {
+    color: #94a3b8;
+    font-size: 0.72rem;
+}
+
+.log-msg {
+    color: #334155;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.log-msg a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+.log-msg a:hover {
+    text-decoration: underline;
+}
+
+.synka-empty-state {
+    color: #94a3b8;
+    text-align: center;
+    padding: 30px 15px;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Modal Guide */
+.synka-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.synka-modal-content {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 720px;
+    max-width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.synka-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.synka-modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #0f172a;
+}
+
+.synka-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #94a3b8;
+}
+.synka-modal-close:hover {
+    color: #0f172a;
+}
+
+.synka-modal-body {
+    padding: 24px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #334155;
+}
+
+.synka-code-box {
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: monospace;
+    margin: 10px 0 20px;
+    overflow-x: auto;
+}
+
+.synka-script-textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 10px 0 20px;
+}
+
+/* Progressive Batch Generation Progress Bar */
+.synka-progress-box {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.synka-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+.synka-progress-bar-bg {
+    width: 100%;
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.synka-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+    border-radius: 8px;
+    transition: width 0.35s ease;
+}
+
+.synka-progress-log {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    max-height: 180px;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.synka-progress-log .log-row {
+    padding: 4px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.synka-progress-log .log-row:last-child {
+    border-bottom: none;
+}
