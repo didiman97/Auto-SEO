@@ -85,6 +85,7 @@ class Synka_Auto_SEO_Post_Creator {
         $post_args = [
             'post_title'    => $clean_title,
             'post_name'     => $seo_slug,
+            'post_excerpt'  => $clean_meta_desc,
             'post_content'  => $content,
             'post_status'   => $status,
             'post_author'   => $author_id,
@@ -104,10 +105,14 @@ class Synka_Auto_SEO_Post_Creator {
             return $post_id;
         }
 
-        // Directly enforce publish status and post_name in database to prevent capability downgrades
+        // Directly enforce publish status, post_name, and post_excerpt in database to prevent capability downgrades
         if ($status === 'publish') {
             global $wpdb;
-            $wpdb->update($wpdb->posts, ['post_status' => 'publish', 'post_name' => $seo_slug], ['ID' => $post_id]);
+            $wpdb->update($wpdb->posts, [
+                'post_status'  => 'publish',
+                'post_name'    => $seo_slug,
+                'post_excerpt' => $clean_meta_desc,
+            ], ['ID' => $post_id]);
             clean_post_cache($post_id);
         }
 
