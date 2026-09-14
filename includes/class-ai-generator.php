@@ -199,9 +199,11 @@ INSTRUKSI STRUKTUR & GENERATIVE ENGINE OPTIMIZATION (GEO):
 5. FAQ (FREQUENTLY ASKED QUESTIONS):
    - Berikan minimal 3-5 pertanyaan & jawaban populer yang sering dicari pengguna terkait topik ini secara tuntas dan solutif.
 
-6. META TAGS & IMAGE PROMPT:
-   - meta_title: Maksimal 60 karakter, CTR-driven & mengandung keyword utama.
-   - meta_description: Antara 140 - 155 karakter persuasif dengan Call-To-Action (CTA).
+6. META TAGS, SLUG (META URL), & IMAGE PROMPT:
+   - title: Judul H1 artikel untuk pembaca website (55 - 75 karakter), menarik, tajam, mengandung keyword utama, bebas tanda kutip.
+   - meta_title: WAJIB PERSIS 50 - 60 KARAKTER (DILARANG LEBIH DARI 60 KARAKTER). Formula CTR tinggi: Tempatkan Keyword Utama di awal + Manfaat/Solusi + Tahun (contoh: "{$keyword}: Panduan Lengkap & Strategi [2026]"). JANGAN tambahkan nama website/brand di akhir karena akan otomatis ditambahkan oleh sistem.
+   - slug: URL slug artikel yang sangat ringkas, bersih, dan ramah SEO (2 - 4 kata saja, huruf kecil dengan tanda hubung, HANYA fokus pada target keyword, TANPA stop words seperti 'dan', 'yang', 'di', 'untuk', 'adalah'). Contoh: 'panduan-seo-onpage', 'belajar-coding-pemula'.
+   - meta_description: Tepat 140 - 155 karakter persuasif yang mengandung keyword utama dan diakhiri kalimat ajakan Call-To-Action (CTA).
    - focus_keyword: {$keyword}
    - image_keyword: 2-3 kata kunci bahasa inggris untuk pencarian visual.
    - image_prompt: Prompt deskriptif detail dalam bahasa Inggris untuk membuat foto fotografi realistis profesional sesuai judul artikel (contoh: "A realistic modern editorial photograph representing {$keyword}, clean professional workspace, 8k resolution, cinematic natural lighting, 16:9 widescreen").
@@ -212,9 +214,10 @@ INSTRUKSI STRUKTUR & GENERATIVE ENGINE OPTIMIZATION (GEO):
 
 FORMAT JSON OUTPUT YANG WAJIB DIHASILKAN (Strict JSON murni):
 {
-  "title": "Judul Artikel Menarik Mengandung Keyword",
-  "meta_title": "Meta Title SEO Ramah CTR",
-  "meta_description": "Meta Description persuasif dengan CTA",
+  "title": "Judul H1 Artikel Menarik Mengandung Keyword",
+  "meta_title": "{$keyword}: Panduan Lengkap & Tips 2026",
+  "slug": "slug-keyword-singkat",
+  "meta_description": "Pelajari panduan komprehensif {$keyword}. Temukan strategi praktis dan tips terbukti untuk hasil maksimal. Baca selengkapnya di sini!",
   "focus_keyword": "{$keyword}",
   "image_keyword": "{$keyword} professional strategy",
   "image_prompt": "A realistic modern editorial photograph of...",
@@ -528,6 +531,7 @@ EOT;
             'content'          => $content,
             'key_takeaways'    => $key_takeaways,
             'meta_title'       => !empty($parsed['meta_title']) ? trim($parsed['meta_title']) : $title,
+            'slug'             => !empty($parsed['slug']) ? trim($parsed['slug']) : '',
             'meta_description' => !empty($parsed['meta_description']) ? trim($parsed['meta_description']) : '',
             'focus_keyword'    => !empty($parsed['focus_keyword']) ? trim($parsed['focus_keyword']) : (isset($row['keyword']) ? $row['keyword'] : ''),
             'image_keyword'    => !empty($parsed['image_keyword']) ? trim($parsed['image_keyword']) : (isset($row['keyword']) ? $row['keyword'] : 'business technology'),
@@ -550,6 +554,11 @@ EOT;
         // Meta Title
         if (preg_match('/"meta_title"\s*:\s*"([^"]+)"/i', $text, $m)) {
             $extracted['meta_title'] = stripslashes($m[1]);
+        }
+
+        // Slug
+        if (preg_match('/"slug"\s*:\s*"([^"]+)"/i', $text, $m)) {
+            $extracted['slug'] = stripslashes($m[1]);
         }
 
         // Meta Description

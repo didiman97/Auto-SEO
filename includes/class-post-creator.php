@@ -70,9 +70,21 @@ class Synka_Auto_SEO_Post_Creator {
         // Determine Post Category
         $cat_ids = $this->resolve_categories($row['category'], $settings);
 
+        // 1. Clean Title (H1)
+        $clean_title = wp_strip_all_tags($title);
+        $clean_title = trim($clean_title, " \t\n\r\0\x0B\"'“”«»`");
+
+        // 2. Generate Clean SEO Friendly URL Slug (post_name)
+        $seo_slug = $this->generate_clean_seo_slug($ai_data, $row, $clean_title);
+
+        // 3. Format High-CTR Meta Title & Description
+        $clean_meta_title = $this->format_seo_meta_title(isset($ai_data['meta_title']) ? $ai_data['meta_title'] : '', $clean_title, isset($row['keyword']) ? $row['keyword'] : '');
+        $clean_meta_desc = $this->format_seo_meta_description(isset($ai_data['meta_description']) ? $ai_data['meta_description'] : '', $clean_title, isset($row['keyword']) ? $row['keyword'] : '');
+
         // Prepare Post Array
         $post_args = [
-            'post_title'    => wp_strip_all_tags($title),
+            'post_title'    => $clean_title,
+            'post_name'     => $seo_slug,
             'post_content'  => $content,
             'post_status'   => $status,
             'post_author'   => $author_id,
@@ -92,23 +104,23 @@ class Synka_Auto_SEO_Post_Creator {
             return $post_id;
         }
 
-        // Directly enforce publish status in database to prevent capability downgrades
+        // Directly enforce publish status and post_name in database to prevent capability downgrades
         if ($status === 'publish') {
             global $wpdb;
-            $wpdb->update($wpdb->posts, ['post_status' => 'publish'], ['ID' => $post_id]);
+            $wpdb->update($wpdb->posts, ['post_status' => 'publish', 'post_name' => $seo_slug], ['ID' => $post_id]);
             clean_post_cache($post_id);
         }
 
         // 1. Set RankMath SEO Metadata
-        $this->set_rankmath_metadata($post_id, $ai_data, $row);
+        $this->set_rankmath_metadata($post_id, $ai_data, $row, $clean_meta_title, $clean_meta_desc);
 
         // 2. Set Yoast SEO Metadata
-        $this->set_yoast_metadata($post_id, $ai_data, $row);
+        $this->set_yoast_metadata($post_id, $ai_data, $row, $clean_meta_title, $clean_meta_desc);
 
         // 3. Attach Featured Image
         $image_kw = !empty($ai_data['image_keyword']) ? $ai_data['image_keyword'] : $row['keyword'];
         $image_prompt = !empty($ai_data['image_prompt']) ? $ai_data['image_prompt'] : '';
-        $this->image_handler->attach_featured_image($post_id, $image_kw, $title, $image_prompt);
+        $this->image_handler->attach_featured_image($post_id, $image_kw, $clean_title, $image_prompt);
 
         return $post_id;
     }
@@ -189,16 +201,14 @@ class Synka_Auto_SEO_Post_Creator {
     /**
      * Set RankMath SEO Metadata
      */
-    private function set_rankmath_metadata($post_id, $ai_data, $row) {
+    private function set_rankmath_metadata($post_id, $ai_data, $row, $clean_meta_title, $clean_meta_desc) {
         $focus_kw = !empty($ai_data['focus_keyword']) ? $ai_data['focus_keyword'] : (!empty($row['keyword']) ? $row['keyword'] : '');
-        $meta_title = !empty($ai_data['meta_title']) ? $ai_data['meta_title'] : (!empty($ai_data['title']) ? $ai_data['title'] : $row['keyword']);
-        $meta_desc = !empty($ai_data['meta_description']) ? $ai_data['meta_description'] : '';
 
-        if (!empty($meta_title)) {
-            update_post_meta($post_id, 'rank_math_title', sanitize_text_field($meta_title));
+        if (!empty($clean_meta_title)) {
+            update_post_meta($post_id, 'rank_math_title', sanitize_text_field($clean_meta_title));
         }
-        if (!empty($meta_desc)) {
-            update_post_meta($post_id, 'rank_math_description', sanitize_textarea_field($meta_desc));
+        if (!empty($clean_meta_desc)) {
+            update_post_meta($post_id, 'rank_math_description', sanitize_textarea_field($clean_meta_desc));
         }
         if (!empty($focus_kw)) {
             update_post_meta($post_id, 'rank_math_focus_keyword', sanitize_text_field($focus_kw));
@@ -209,20 +219,148 @@ class Synka_Auto_SEO_Post_Creator {
     /**
      * Set Yoast SEO Metadata
      */
-    private function set_yoast_metadata($post_id, $ai_data, $row) {
+    private function set_yoast_metadata($post_id, $ai_data, $row, $clean_meta_title, $clean_meta_desc) {
         $focus_kw = !empty($ai_data['focus_keyword']) ? $ai_data['focus_keyword'] : (!empty($row['keyword']) ? $row['keyword'] : '');
-        $meta_title = !empty($ai_data['meta_title']) ? $ai_data['meta_title'] : (!empty($ai_data['title']) ? $ai_data['title'] : $row['keyword']);
-        $meta_desc = !empty($ai_data['meta_description']) ? $ai_data['meta_description'] : '';
 
-        if (!empty($meta_title)) {
-            update_post_meta($post_id, '_yoast_wpseo_title', sanitize_text_field($meta_title));
+        if (!empty($clean_meta_title)) {
+            update_post_meta($post_id, '_yoast_wpseo_title', sanitize_text_field($clean_meta_title));
         }
-        if (!empty($meta_desc)) {
-            update_post_meta($post_id, '_yoast_wpseo_metadesc', sanitize_textarea_field($meta_desc));
+        if (!empty($clean_meta_desc)) {
+            update_post_meta($post_id, '_yoast_wpseo_metadesc', sanitize_textarea_field($clean_meta_desc));
         }
         if (!empty($focus_kw)) {
             update_post_meta($post_id, '_yoast_wpseo_focuskw', sanitize_text_field($focus_kw));
         }
+    }
+
+    /**
+     * Generate concise, high-ranking SEO friendly post slug (URL permalink)
+     * Keeps slug between 2-5 impactful words, removes stop words, and enforces uniqueness.
+     */
+    public function generate_clean_seo_slug($ai_data, $row, $title) {
+        // Priority 1: AI Suggested slug if provided
+        $candidate = '';
+        if (!empty($ai_data['slug'])) {
+            $candidate = $ai_data['slug'];
+        } elseif (!empty($row['keyword'])) {
+            $candidate = $row['keyword'];
+        } elseif (!empty($ai_data['focus_keyword'])) {
+            $candidate = $ai_data['focus_keyword'];
+        } else {
+            $candidate = $title;
+        }
+
+        // Clean candidate text
+        $candidate = strtolower(trim(strip_tags($candidate)));
+        $candidate = preg_replace('/[^\p{L}\p{N}\s-]/u', '', $candidate);
+
+        // List of Indonesian and English Stop Words to strip from long slugs
+        $stop_words = [
+            'yang', 'dan', 'di', 'ke', 'dari', 'pada', 'untuk', 'adalah', 'tentang', 'sebuah', 
+            'ini', 'itu', 'dengan', 'atau', 'dalam', 'oleh', 'serta', 'sebagai', 'agar', 
+            'karena', 'bisa', 'akan', 'harus', 'saya', 'kamu', 'anda', 'kita', 'mereka',
+            'tersebut', 'suatu', 'saat', 'seperti', 'terhadap', 'bagi', 'hingga', 'yaitu',
+            'the', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'it'
+        ];
+
+        $words = preg_split('/[\s-]+/', $candidate, -1, PREG_SPLIT_NO_EMPTY);
+        
+        // If candidate is long (> 3 words), strip stop words
+        if (count($words) > 3) {
+            $filtered = [];
+            foreach ($words as $w) {
+                if (!in_array($w, $stop_words, true)) {
+                    $filtered[] = $w;
+                }
+            }
+            if (!empty($filtered)) {
+                $words = $filtered;
+            }
+        }
+
+        // Limit to max 4-5 meaningful words for punchy, SEO-optimal URLs
+        $words = array_slice($words, 0, 5);
+        $slug = implode('-', $words);
+        $slug = sanitize_title($slug);
+
+        // Fallback if empty
+        if (empty($slug)) {
+            $slug = sanitize_title($title);
+        }
+
+        return wp_unique_post_slug($slug, 0, 'publish', 'post', 0);
+    }
+
+    /**
+     * Clean and format High-CTR SEO Meta Title (strictly 50 - 60 chars)
+     */
+    public function format_seo_meta_title($raw_meta_title, $post_title, $keyword) {
+        $title = !empty($raw_meta_title) ? $raw_meta_title : $post_title;
+        
+        // Strip markdown, quotes, HTML tags, and common AI prefixes
+        $title = strip_tags($title);
+        $title = preg_replace('/^(?:meta\s*title|judul\s*seo|title|judul)\s*[:=-]\s*/i', '', $title);
+        $title = trim($title, " \t\n\r\0\x0B\"'“”«»`");
+
+        // Remove trailing site branding (e.g. " - Clickku", " | Clickku.id") to avoid double branding with SEO plugins
+        $title = preg_replace('/\s*[-|–—]\s*(?:clickku|clickku\.id|synka|blog|website|official).*$/i', '', $title);
+
+        $kw = !empty($keyword) ? trim($keyword) : '';
+
+        // If title is too short (< 25 chars) and keyword exists, construct a high-CTR title
+        if (mb_strlen($title) < 25 && !empty($kw)) {
+            $current_year = date('Y');
+            $title = ucwords($kw) . ": Panduan Lengkap & Tips [{$current_year}]";
+        }
+
+        // If title is longer than 60 chars, trim at word boundary safely without cutting words in half
+        if (mb_strlen($title) > 60) {
+            $cut = mb_substr($title, 0, 60);
+            $last_space = mb_strrpos($cut, ' ');
+            if ($last_space !== false && $last_space > 40) {
+                $title = mb_substr($cut, 0, $last_space);
+            } else {
+                $title = $cut;
+            }
+            $title = rtrim($title, " \t\n\r\0\x0B,-:|–—");
+        }
+
+        return $title;
+    }
+
+    /**
+     * Clean and format High-CTR SEO Meta Description (strictly 140 - 155 chars)
+     */
+    public function format_seo_meta_description($raw_meta_desc, $post_title, $keyword) {
+        $desc = !empty($raw_meta_desc) ? $raw_meta_desc : '';
+        
+        // Strip tags, quotes, AI labels
+        $desc = strip_tags($desc);
+        $desc = preg_replace('/^(?:meta\s*description|deskripsi\s*seo|snippet|desc)\s*[:=-]\s*/i', '', $desc);
+        $desc = trim($desc, " \t\n\r\0\x0B\"'“”«»`");
+
+        // Fallback if empty
+        if (empty($desc)) {
+            $kw = !empty($keyword) ? $keyword : $post_title;
+            $desc = "Pelajari panduan lengkap seputar {$kw}. Temukan tips praktis, strategi efektif, dan solusi terbaik untuk hasil optimal di sini!";
+        }
+
+        // If description is longer than 155 chars, trim at word boundary
+        if (mb_strlen($desc) > 155) {
+            $cut = mb_substr($desc, 0, 155);
+            $last_space = mb_strrpos($cut, ' ');
+            if ($last_space !== false && $last_space > 120) {
+                $desc = mb_substr($cut, 0, $last_space);
+            } else {
+                $desc = $cut;
+            }
+            $desc = rtrim($desc, " \t\n\r\0\x0B,-:|–—");
+            if (!in_array(mb_substr($desc, -1), ['.', '!', '?'])) {
+                $desc .= '.';
+            }
+        }
+
+        return $desc;
     }
 
     /**
